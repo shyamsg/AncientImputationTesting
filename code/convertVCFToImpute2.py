@@ -83,16 +83,17 @@ def main():
     for i in range(2*num_samples):
         haps.append("")
     # Open the output files
-    legend_file = gzip.open(args.outFile + ".legend.gz")
+    legend_file = gzip.open(args.outPrefix + ".legend.gz")
     # Now process one vcf line at a time
     for line in infile:
         process_one_vcf_line(line, legend_file, haps, num_samples)
     legend_file.close()
-    haps_file = gzip.open(args.outFile + ".haps.gz")
+    haps_file = gzip.open(args.outPrefix + ".haps.gz")
     for hap in haps:
         haps_file.write(hap)
         haps_file.write("\n")
     haps_file.close()
+    infile.close()
 
 
 main()
