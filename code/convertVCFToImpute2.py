@@ -26,6 +26,9 @@ def parse_args():
                                      version="1.0")
     parser.add_argument("-i", "--inputFile", help="Input in beagle format",
                         required=True)
+    parser.add_argument("-p", "--partLength", type=int, 
+                        help="Number of SNPs in each part", 
+                        required=False, default=10000)
     parser.add_argument("-o", "--outPrefix", help="Out prefix",
                         default="")
     args = parser.parse_args()
