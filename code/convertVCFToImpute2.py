@@ -70,6 +70,28 @@ def process_one_vcf_line(vcf_line, legend_file, haps, num_samples):
         haps[2*index + 1] += geno[2]
 
 
+def write_hap_part(partnum, haps, prefix):
+    """Write haps part file.
+
+    Write the current haps to a partial haps file.
+
+    Parameters
+    ----------
+    partnum : int
+        Part number
+    haps : list of strings
+        Haplotypes
+    prefix : string
+        Output file prefix
+
+    """
+    haps_file = gzip.open(prefix + ".part" + str(partnum) + ".haps.gz", "wb")
+    for hap in haps:
+        haps_file.write(hap)
+        haps_file.write("\n")
+    haps_file.close()
+
+
 def main():
     """Do all the work here."""
     args = parse_args()
@@ -95,24 +117,14 @@ def main():
         process_one_vcf_line(line, legend_file, haps, num_samples)
         cnt = cnt + 1
         if cnt % args.partLength == 0:
-            haps_file = gzip.open(args.outPrefix + ".part" + str(partnum) +
-                                  ".haps.gz", "wb")
-            for hap in haps:
-                haps_file.write(hap)
-                haps_file.write("\n")
-            haps_file.close()
+            write_hap_part(partnum, haps, args.outPrefix)
             partnum = partnum + 1
             del haps[:]
             for i in range(2*num_samples):
                 haps.append("")
     # check for leftovers
     if cnt % args.partLength != 0:
-        haps_file = gzip.open(args.outPrefix + ".part" +
-                              str(args.partLength) + ".haps.gz", "wb")
-        for hap in haps:
-            haps_file.write(hap)
-            haps_file.write("\n")
-        haps_file.close()
+        write_hap_part(partnum, haps, args.outPrefix)
         del haps[:]
     legend_file.close()
     infile.close()
