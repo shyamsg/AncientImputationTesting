@@ -5,9 +5,10 @@ Date:    18th February 2019
 Version: 1.0
 """
 
+
 import argparse
-import os
 import gzip
+import os
 
 
 def parse_args():
@@ -26,8 +27,8 @@ def parse_args():
                                      version="1.0")
     parser.add_argument("-i", "--inputFile", help="Input in beagle format",
                         required=True)
-    parser.add_argument("-p", "--partLength", type=int, 
-                        help="Number of SNPs in each part", 
+    parser.add_argument("-p", "--partLength", type=int,
+                        help="Number of SNPs in each part",
                         required=False, default=10000)
     parser.add_argument("-o", "--outPrefix", help="Out prefix",
                         default="")
@@ -88,15 +89,20 @@ def main():
     # Open the output files
     legend_file = gzip.open(args.outPrefix + ".legend.gz", "wb")
     # Now process one vcf line at a time
+    cnt = 0
     for line in infile:
         process_one_vcf_line(line, legend_file, haps, num_samples)
+        if cnt % args.partLength == 0:
+            haps_file = gzip.open(args.outPrefix + ".part" +
+                                  str(args.partLength) + ".haps.gz", "wb")
+            for hap in haps:
+                haps_file.write(hap)
+                haps_file.write("\n")
+            haps_file.close()
+            del haps[:]
+            for i in range(2*num_samples):
+                haps.append("")
     legend_file.close()
-    haps_file = gzip.open(args.outPrefix + ".haps.gz", "wb")
-    for hap in haps:
-        haps_file.write(hap)
-        haps_file.write("\n")
-    haps_file.close()
     infile.close()
-
 
 main()
