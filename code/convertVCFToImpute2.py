@@ -95,8 +95,8 @@ def main():
         process_one_vcf_line(line, legend_file, haps, num_samples)
         cnt = cnt + 1
         if cnt % args.partLength == 0:
-            haps_file = gzip.open(args.outPrefix + ".part" +
-                                  str(args.partLength) + ".haps.gz", "wb")
+            haps_file = gzip.open(args.outPrefix + ".part" + str(partnum) +
+                                  ".haps.gz", "wb")
             for hap in haps:
                 haps_file.write(hap)
                 haps_file.write("\n")
