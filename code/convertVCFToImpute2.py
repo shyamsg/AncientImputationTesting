@@ -90,6 +90,7 @@ def main():
     legend_file = gzip.open(args.outPrefix + ".legend.gz", "wb")
     # Now process one vcf line at a time
     cnt = 0
+    partnum = 0
     for line in infile:
         process_one_vcf_line(line, legend_file, haps, num_samples)
         cnt = cnt + 1
@@ -100,9 +101,19 @@ def main():
                 haps_file.write(hap)
                 haps_file.write("\n")
             haps_file.close()
+            partnum = partnum + 1
             del haps[:]
             for i in range(2*num_samples):
                 haps.append("")
+    # check for leftovers
+    if cnt % args.partLength != 0:
+        haps_file = gzip.open(args.outPrefix + ".part" +
+                              str(args.partLength) + ".haps.gz", "wb")
+        for hap in haps:
+            haps_file.write(hap)
+            haps_file.write("\n")
+        haps_file.close()
+        del haps[:]
     legend_file.close()
     infile.close()
 
